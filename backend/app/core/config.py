@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     generation_lock_seconds: int = 90
 
     inpaint_lama_enabled: bool = True
+    inpaint_lama_preload: bool = False
     inpaint_lama_device: str = "cpu"
     inpaint_lama_max_image_bytes: int = 5 * 1024 * 1024
     inpaint_lama_max_pixels: int = 4_194_304

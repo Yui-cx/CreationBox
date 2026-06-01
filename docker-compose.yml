@@ -33,6 +33,12 @@ services:
       DATABASE_URL: postgresql+psycopg://creationbox:creationbox@postgres:5432/creationbox
       REDIS_URL: redis://redis:6379/0
       CORS_ORIGINS: http://localhost:8080,http://localhost
+      INPAINT_LAMA_PRELOAD: "true"
+      XDG_CACHE_HOME: /root/.cache
+      TORCH_HOME: /root/.cache/torch
+      HF_HOME: /root/.cache/huggingface
+    volumes:
+      - lama_cache:/root/.cache
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,3 +66,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  lama_cache:

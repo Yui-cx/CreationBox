@@ -22,6 +22,10 @@ _lama_model_lock = threading.Lock()
 _lama_task_lock = asyncio.Lock()
 
 
+def is_lama_model_loading() -> bool:
+    return _lama_model is None and _lama_model_lock.locked()
+
+
 def _get_lama_model(settings: Settings):
     global _lama_model
     if _lama_model is not None:
@@ -45,6 +49,12 @@ def _get_lama_model(settings: Settings):
         except Exception as exc:
             raise LamaUnavailableError("LAMA_UNAVAILABLE") from exc
         return _lama_model
+
+
+async def preload_lama_model(settings: Settings) -> None:
+    if not settings.inpaint_lama_enabled or not settings.inpaint_lama_preload:
+        return
+    await asyncio.to_thread(_get_lama_model, settings)
 
 
 def _to_lama_image(source_bgr: np.ndarray) -> Image.Image:
@@ -79,6 +89,9 @@ async def inpaint_with_lama(source_bgr: np.ndarray, mask_gray: np.ndarray, setti
 
     if settings.inpaint_lama_concurrency != 1:
         raise LamaUnavailableError("LAMA_UNAVAILABLE")
+
+    if is_lama_model_loading():
+        raise LamaBusyError("LAMA_BUSY")
 
     if _lama_task_lock.locked():
         raise LamaBusyError("LAMA_BUSY")
