@@ -1,0 +1,181 @@
+.mobile-tools { display: none; }
+
+[data-theme="dark"] .app-shell,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .auth-form,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .mobile-tools {
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+}
+
+[data-theme="dark"] .nav-button:hover,
+[data-theme="dark"] .nav-button.active,
+[data-theme="dark"] .quota-card,
+[data-theme="dark"] .segmented,
+[data-theme="dark"] .mode-tabs,
+[data-theme="dark"] .segmented .active,
+[data-theme="dark"] .mode-tabs .active,
+[data-theme="dark"] .mobile-tools .active,
+[data-theme="dark"] .secondary-button,
+[data-theme="dark"] .icon-button,
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .rich-input,
+[data-theme="dark"] .result-rich-text,
+[data-theme="dark"] .result-copy,
+[data-theme="dark"] .quick-chips button,
+[data-theme="dark"] .history-item > button:first-child,
+[data-theme="dark"] .history-category-header,
+[data-theme="dark"] .repair-mode-switch,
+[data-theme="dark"] .engine-note,
+[data-theme="dark"] .upload-zone,
+[data-theme="dark"] .image-canvas-shell,
+[data-theme="dark"] .image-result-preview,
+[data-theme="dark"] .model-status,
+[data-theme="dark"] .muted-pill {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] .secondary-button:hover:not(:disabled),
+[data-theme="dark"] .icon-button:hover:not(:disabled),
+[data-theme="dark"] .quick-chips button:hover,
+[data-theme="dark"] .history-item > button:first-child:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+[data-theme="dark"] .eyebrow,
+[data-theme="dark"] .tool-kicker,
+[data-theme="dark"] .markdown-body blockquote,
+[data-theme="dark"] .markdown-body pre {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .status-pill.success {
+  color: #86efac;
+}
+
+@media (max-width: 1180px) {
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
+  .image-work-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-form-grid,
+  .model-status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1040px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    width: 100%;
+    min-height: 100dvh;
+    height: auto;
+    margin: 0;
+    border-radius: 0;
+  }
+  .sidebar {
+    display: none;
+  }
+  .mobile-tools {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  .mobile-tools button {
+    min-width: 150px;
+    flex: 0 0 auto;
+    border: 1px solid var(--glass-border);
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  .auth-panel {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px 0;
+  }
+  .auth-panel h1 {
+    font-size: 32px;
+  }
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+  .top-actions, .top-actions > button {
+    width: 100%;
+  }
+  .workspace {
+    padding: 18px 16px;
+  }
+  .tool-header h2 {
+    font-size: 24px;
+  }
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+  .admin-form-grid,
+  .model-status-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-tabs {
+    width: 100%;
+  }
+  .admin-tabs button {
+    flex: 1 1 150px;
+  }
+  .result-toolbar {
+    display: grid;
+  }
+  .result-actions > button, .action-row > button {
+    flex: 1 1 150px;
+  }
+  .history-category-body {
+    padding-left: 0;
+  }
+  .history-category-header {
+    align-items: flex-start;
+  }
+  .history-category-title {
+    align-items: flex-start;
+  }
+  .notice-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .image-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .image-canvas-shell,
+  .image-result-preview {
+    min-height: 300px;
+  }
+  .canvas-stage,
+  .image-result-preview img {
+    max-height: 62vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
