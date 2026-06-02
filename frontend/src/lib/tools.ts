@@ -29,11 +29,11 @@ export const tools: Record<string, ToolConfig> = {
     tag: "降AIGC",
     description: "在不承诺检测结果的前提下，调整文本语序、词汇和句式，让表达更平实普通。",
     modes: [
-      { id: "text", label: "文本输入", limit: 1500 }
+      { id: "text", label: "文本输入", limit: 8000 }
     ],
     generateLabel: "开始处理",
     sourceLabel: "输入内容",
-    sourceHelper: "输入文本最多 1500 字，文件读取即将支持 markdown、txt、word。",
+    sourceHelper: "输入文本最多 8000 字，可读取 Markdown、TXT、Word .docx 文件。",
     textPlaceholder: "输入需要处理的论文段落或正文内容。",
     styles: ["默认"],
     tones: ["默认"],

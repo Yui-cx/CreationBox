@@ -1,7 +1,36 @@
-import type { Ref, RefObject } from "react";
+import { useRef, useState, type ChangeEvent, type DragEvent, type Ref, type RefObject } from "react";
 import { Copy, Download, Eraser, FileText, RefreshCw, Sparkles, Upload, WandSparkles } from "lucide-react";
 import { MarkdownRenderer } from "../../components/MarkdownRenderer";
 import type { ToolConfig, ToolType } from "../../types";
+
+const AIGC_FILE_MAX_BYTES = 10 * 1024 * 1024;
+const AIGC_FILE_TEXT_LIMIT = 8000;
+const AIGC_ACCEPTED_EXTENSIONS = [".md", ".markdown", ".txt", ".docx"];
+const AIGC_ACCEPT = ".md,.markdown,.txt,.docx,text/markdown,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function fileExtension(fileName: string) {
+  const index = fileName.lastIndexOf(".");
+  return index >= 0 ? fileName.slice(index).toLowerCase() : "";
+}
+
+async function readAigcFile(file: File) {
+  const extension = fileExtension(file.name);
+  if (extension === ".doc") {
+    throw new Error("暂不支持旧版 .doc 文件，请另存为 .docx 后上传。");
+  }
+  if (!AIGC_ACCEPTED_EXTENSIONS.includes(extension)) {
+    throw new Error("仅支持 Markdown、TXT、Word .docx 文件。");
+  }
+  if (file.size > AIGC_FILE_MAX_BYTES) {
+    throw new Error("文件不能超过 10MB。");
+  }
+  if (extension === ".docx") {
+    const { default: mammoth } = await import("mammoth");
+    const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return result.value.trim();
+  }
+  return (await file.text()).trim();
+}
 
 type CreationWorkspaceProps = {
   tool: ToolConfig;
@@ -30,7 +59,9 @@ type CreationWorkspaceProps = {
   preserveFormat: boolean;
   setPreserveFormat: (value: boolean) => void;
   status: string;
+  setStatus: (value: string) => void;
   error: string;
+  setError: (value: string) => void;
   isGenerating: boolean;
   result: string;
   generationId: string | null;
@@ -67,7 +98,9 @@ export function CreationWorkspace({
   preserveFormat,
   setPreserveFormat,
   status,
+  setStatus,
   error,
+  setError,
   isGenerating,
   result,
   generationId,
@@ -76,6 +109,8 @@ export function CreationWorkspace({
   copyResult,
   exportCurrentMarkdown,
 }: CreationWorkspaceProps) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isFileDragging, setIsFileDragging] = useState(false);
   const activeMode = tool.modes.find((item) => item.id === mode) ?? tool.modes[0];
   const charCount = inputText.trim().length;
   const showLink = mode === "link";
@@ -85,6 +120,55 @@ export function CreationWorkspace({
   const showConfig = toolId === "generate";
   const showFormatOption = toolId === "humanize" || toolId === "aigc_reduce";
   const showRichResult = showFormatOption || toolId === "generate";
+
+  async function handleAigcFile(file?: File) {
+    if (!file) return;
+    try {
+      setError("");
+      setStatus("正在读取文件...");
+      const text = await readAigcFile(file);
+      if (!text) {
+        throw new Error("文件内容为空或无法读取正文。");
+      }
+      setInputText(text);
+      setIsInputEditing(false);
+      if (text.length > AIGC_FILE_TEXT_LIMIT) {
+        setError(`文件内容已读取，但超过 ${AIGC_FILE_TEXT_LIMIT} 字，请删减后再生成。`);
+        setStatus(`已读取 ${file.name}，当前 ${text.length} 字，超过上限。`);
+        return;
+      }
+      setStatus(`已读取 ${file.name}，共 ${text.length} 字。`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "文件读取失败。");
+      setStatus("文件读取失败。");
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function handleFileInputChange(event: ChangeEvent<HTMLInputElement>) {
+    void handleAigcFile(event.target.files?.[0]);
+  }
+
+  function handleFileDragOver(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setIsFileDragging(true);
+  }
+
+  function handleFileDragLeave() {
+    setIsFileDragging(false);
+  }
+
+  function handleFileDrop(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setIsFileDragging(false);
+    void handleAigcFile(event.dataTransfer.files?.[0]);
+  }
+
+  function updateInputText(value: string) {
+    setInputText(value);
+    if (error) setError("");
+  }
 
   return (
     <>
@@ -136,11 +220,11 @@ export function CreationWorkspace({
                   }}
                 >
                   <textarea
-                        ref={inputTextAreaRef as Ref<HTMLTextAreaElement>}
+                    ref={inputTextAreaRef as Ref<HTMLTextAreaElement>}
                     className="rich-input-editor"
                     value={inputText}
                     placeholder={tool.textPlaceholder}
-                    onChange={(event) => setInputText(event.target.value)}
+                    onChange={(event) => updateInputText(event.target.value)}
                     onFocus={() => setIsInputEditing(true)}
                     onBlur={() => setIsInputEditing(false)}
                   />
@@ -151,7 +235,7 @@ export function CreationWorkspace({
                   )}
                 </div>
               ) : (
-                <textarea value={inputText} placeholder={tool.textPlaceholder} onChange={(event) => setInputText(event.target.value)} />
+                <textarea value={inputText} placeholder={tool.textPlaceholder} onChange={(event) => updateInputText(event.target.value)} />
               )}
               <small className={activeMode.limit && charCount > activeMode.limit ? "danger-text" : ""}>
                 {activeMode.limit ? `${charCount} / ${activeMode.limit} 字` : `${charCount} 字`}
@@ -159,11 +243,17 @@ export function CreationWorkspace({
             </label>
           )}
           {toolId === "aigc_reduce" && (
-            <div className="upload-zone disabled-upload" aria-disabled="true">
+            <label
+              className={`upload-zone ${isFileDragging ? "drag-over" : ""}`}
+              onDragOver={handleFileDragOver}
+              onDragLeave={handleFileDragLeave}
+              onDrop={handleFileDrop}
+            >
+              <input ref={fileInputRef} type="file" accept={AIGC_ACCEPT} onChange={handleFileInputChange} />
               <Upload size={24} aria-hidden="true" />
-              <span>文件读取即将支持</span>
-              <small>后续将支持 markdown、txt、word 文件；当前请先粘贴文本。</small>
-            </div>
+              <span>点击或拖拽上传文件</span>
+              <small>支持 Markdown、TXT、Word .docx，最多 10MB，读取后最多 8000 字。</small>
+            </label>
           )}
           {showFormatOption && (
             <div className="field">
@@ -229,7 +319,7 @@ export function CreationWorkspace({
                   setMode("topic");
                   setTopic(example);
                 } else {
-                  setInputText(example);
+                  updateInputText(example);
                 }
               }}>
                 {example.startsWith("http") ? "参考链接示例" : example.slice(0, 18)}

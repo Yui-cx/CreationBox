@@ -223,7 +223,9 @@ export function Workspace() {
               preserveFormat={preserveFormat}
               setPreserveFormat={setPreserveFormat}
               status={status}
+              setStatus={setStatus}
               error={error}
+              setError={setError}
               isGenerating={isGenerating}
               result={result}
               generationId={generationId}
@@ -237,4 +239,3 @@ export function Workspace() {
     </div>
   );
 }
-

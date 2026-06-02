@@ -214,10 +214,12 @@ def test_aigc_reduce_stream_generation_and_history(client: TestClient):
 def test_aigc_reduce_validation_rejects_empty_and_over_limit():
     empty = GenerationRequest.model_validate({"tool_type": "aigc_reduce", "mode": "text", "input_text": "正文"})
     assert empty.tool_type == "aigc_reduce"
+    max_length = GenerationRequest.model_validate({"tool_type": "aigc_reduce", "mode": "text", "input_text": "字" * 8000})
+    assert len(max_length.input_text or "") == 8000
     with pytest.raises(ValueError):
         GenerationRequest.model_validate({"tool_type": "aigc_reduce", "mode": "text", "input_text": ""})
     with pytest.raises(ValueError):
-        GenerationRequest.model_validate({"tool_type": "aigc_reduce", "mode": "text", "input_text": "字" * 1501})
+        GenerationRequest.model_validate({"tool_type": "aigc_reduce", "mode": "text", "input_text": "字" * 8001})
 
 
 def test_history_is_limited_to_ten_and_excludes_removed_tool(client: TestClient):

@@ -14,7 +14,7 @@ def split_reference_links(input_url: str | None) -> list[str]:
 class GenerationRequest(BaseModel):
     tool_type: ToolType
     mode: str = Field(max_length=32)
-    input_text: str | None = Field(default=None, max_length=6000)
+    input_text: str | None = Field(default=None, max_length=8000)
     input_url: str | None = Field(default=None, max_length=6000)
     topic: str | None = Field(default=None, max_length=500)
     materials: str | None = Field(default=None, max_length=6000)
@@ -37,8 +37,8 @@ class GenerationRequest(BaseModel):
             text = (self.input_text or "").strip()
             if not text:
                 raise ValueError("VALIDATION_ERROR: 请输入需要处理的文本。")
-            if len(text) > 1500:
-                raise ValueError("VALIDATION_ERROR: 输入文本最多支持 1500 字。")
+            if len(text) > 8000:
+                raise ValueError("VALIDATION_ERROR: 输入文本最多支持 8000 字。")
         if self.tool_type == "generate":
             if self.mode not in {"topic", "link"}:
                 raise ValueError("VALIDATION_ERROR: 生成文章仅支持主题生成或参考链接。")
