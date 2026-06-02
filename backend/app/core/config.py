@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     inpaint_lama_enabled: bool = True
     inpaint_lama_preload: bool = False
     inpaint_lama_device: str = "cpu"
-    inpaint_lama_max_image_bytes: int = 5 * 1024 * 1024
+    inpaint_lama_max_image_bytes: int = 10 * 1024 * 1024
     inpaint_lama_max_pixels: int = 4_194_304
     inpaint_lama_concurrency: int = 1
     inpaint_lama_fallback_opencv: bool = False

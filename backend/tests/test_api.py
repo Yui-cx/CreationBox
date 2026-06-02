@@ -547,7 +547,7 @@ def test_image_inpaint_lama_rejects_large_image(client: TestClient):
         headers=headers,
         data={"engine": "lama", "radius": "5"},
         files={
-            "image": ("source.png", b"0" * (5 * 1024 * 1024 + 1), "image/png"),
+            "image": ("source.png", b"0" * (10 * 1024 * 1024 + 1), "image/png"),
             "mask": ("mask.png", png_bytes(mask), "image/png"),
         },
     )

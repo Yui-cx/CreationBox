@@ -9,7 +9,7 @@ type ImageToolMode = "brush" | "rect";
 type ImageMethod = "telea" | "ns";
 type ImageEngine = "opencv" | "lama";
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-const MAX_LAMA_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_LAMA_IMAGE_BYTES = 10 * 1024 * 1024;
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const DEFAULT_IMAGE_INPAINT_RADIUS = 5;
 
@@ -36,7 +36,7 @@ export function ImageWatermarkPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const maxUploadBytes = engine === "lama" ? MAX_LAMA_IMAGE_BYTES : MAX_IMAGE_BYTES;
-  const maxUploadLabel = engine === "lama" ? "5MB" : "10MB";
+  const maxUploadLabel = "10MB";
   const isSourceTooLarge = Boolean(sourceFile && sourceFile.size > maxUploadBytes);
   const processingStatus = engine === "lama" && isProcessing
     ? `智能修复中，已等待 ${formatElapsedTime(elapsedSeconds)}。首次等待时间较长，CPU 推理期间请保持当前页面打开。`
@@ -294,7 +294,7 @@ export function ImageWatermarkPage() {
                 智能修复
               </button>
             </div>
-            <small>{engine === "lama" ? "智能修复使用 LaMa CPU 推理，图片需小于 5MB；首次等待时间较长，处理期间请保持页面打开。" : "快速修复使用本地 OpenCV，适合小水印、角落 Logo 和简单背景。"}</small>
+            <small>{engine === "lama" ? "智能修复使用 LaMa CPU 推理，图片需小于 10MB；首次等待时间较长，处理期间请保持页面打开。" : "快速修复使用本地 OpenCV，适合小水印、角落 Logo 和简单背景。"}</small>
           </div>
 
           <label
@@ -433,4 +433,3 @@ export function ImageWatermarkPage() {
     </section>
   );
 }
-

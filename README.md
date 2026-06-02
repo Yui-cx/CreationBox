@@ -1,10 +1,8 @@
 # CreationBox MVP
 
-## 中文说明
+CreationBox 是一个面向文本编写创作的 AI 创作工作台 MVP。项目将原始静态原型升级为可运行的前后端分离应用，提供智能文本创作、历史记录、Markdown 导出、图片水印去除、管理员用户管理和模型配置等基础能力。
 
-CreationBox 是一个面向公众号、自媒体和内容运营场景的 AI 创作工作台 MVP。项目将原始静态原型升级为可运行的前后端分离应用，提供智能文本创作、历史记录、Markdown 导出、图片水印去除、管理员用户管理和模型配置等基础能力。
-
-本项目为个人学习与演示用途，属于 AI 辅助开发项目，约 80% 由 AI 生成或辅助实现，约 20% 由人工整理、调试和决策完成。当前版本适合作为功能演示 MVP，不建议直接用于生产环境。
+本项目为个人学习与演示用途，属于 AI 辅助开发项目，当前版本适合作为功能演示 MVP。
 
 ## 功能点
 
@@ -46,7 +44,7 @@ CreationBox/
 - 数据层：开发环境默认可使用 SQLite，Docker Compose 环境使用 PostgreSQL；Redis 用于登录限流和生成锁。
 - 部署层：Docker Compose 编排 PostgreSQL、Redis、API、前端静态站点和 Nginx。
 
-## 智能创作与 Skill 提示词
+## 智能创作与提示词
 
 智能创作模块的模型交互强依赖 `Skill/` 目录下的文件：
 
@@ -54,7 +52,7 @@ CreationBox/
 - `Skill/AIGC-Reduce-zh-SKILL.md`：降 AIGC 率文本改写。
 - `Skill/Article-Generate-zh-SKILL.md`：公众号文章生成。
 
-后端会读取这些 Skill 文件作为系统提示词或提示词模板的一部分，再结合用户输入构造模型请求。后续可以持续向 `Skill/` 目录添加新的提示词文件，并在后端注册对应工具类型，从而扩展新的模型交互能力，例如标题生成、选题分析、爆款结构拆解、短视频脚本、私域文案等。
+后端会读取这些 Skill 文件作为系统提示词或提示词模板的一部分，再结合用户输入构造模型请求。后续可以持续向 `Skill/` 目录添加新的提示词文件，并在后端注册对应工具类型，从而扩展新的模型交互能力。
 
 这种设计把“模型能力设计”和“业务代码”拆开，方便在不大改接口的情况下迭代 Prompt、调整输出风格和增加创作工具。
 
@@ -65,11 +63,8 @@ CreationBox/
 1. OpenCV 快速修复
    - 前端让用户上传图片，并用画笔或矩形标注需要修复的水印区域。
    - 后端接收原图和 mask，使用 OpenCV 的 `cv2.inpaint` 进行修复。
-   - 支持 Telea 和 Navier-Stokes 两种算法。
    - 优点是依赖相对轻、速度快，适合简单水印、纯色背景或纹理不复杂的场景。
-
 2. LaMa 智能修复
-   - 前端标注流程与 OpenCV 相同。
    - 后端将图片和 mask 交给 `simple-lama-inpainting` 进行深度学习图像补全。
    - 通过配置限制图片大小、像素数量和并发，避免本地 CPU/GPU 资源被占满。
    - Docker Compose 环境会挂载模型缓存目录，并通过 `INPAINT_LAMA_PRELOAD=true` 在后端启动后后台预热模型，减少首次点击智能修复时的等待。
@@ -93,14 +88,6 @@ CreationBox/
 - 默认关闭公开注册，主要由管理员创建和管理用户。
 - 管理员可创建用户、修改状态、设置管理员权限、调整每日额度、重置密码。
 - 普通用户使用每日额度限制；管理员默认无限额度。
-
-待完善方向：
-
-- 上线环境必须修改默认管理员密码和 `JWT_SECRET`。
-- 增加用户自助注册、邮箱验证、找回密码。
-- 增加 refresh token 自动续期和退出登录撤销。
-- 增加更细粒度的角色权限、操作日志和审计记录。
-- 增加会员套餐、额度消耗明细和支付闭环。
 
 ## 快速启动
 
@@ -192,98 +179,91 @@ AI_MODEL_TEXT=your-model-id
 
 ## 注意事项
 
-- 本项目仅为个人学习与 MVP 演示，不承诺生成质量、检测规避或生产可用性。
-- 首版数据库 schema 在 FastAPI 启动时自动创建，生产化前应引入 Alembic 迁移。
+- 首版数据库 schema 在 FastAPI 启动时自动创建。
 - 链接抓取和文件解析尚未完整实现，参考链接目前主要作为文本上下文传给模型。
 - 图片智能修复依赖较重，LaMa 模式在 CPU 环境下可能较慢。
 - 上线前务必替换默认账号密码、JWT 密钥、CORS 配置和真实模型 Key。
 
 ---
 
-## English README
+## English
 
-CreationBox is an AI-powered writing workspace MVP for public-account, creator, and content-operations workflows. It turns the original static prototype into a runnable full-stack application with AI writing tools, streaming generation, history records, Markdown export, image watermark removal, basic admin user management, and model configuration.
+CreationBox is an AI writing workspace MVP for text creation workflows. It turns an original static prototype into a runnable full-stack application with AI-assisted writing tools, streaming generation, history records, Markdown export, image watermark removal, basic admin user management, and model configuration.
 
-This is a personal learning and demo project. It is an AI-assisted project, roughly 80% AI-generated or AI-assisted and 20% manually organized, debugged, and decided. It is suitable as a demo MVP, not as a production-ready system.
+This project is built for personal learning and MVP demonstration. It is suitable for showcasing an AI product workflow, but it is not production-ready.
 
 ## Features
 
-- AI writing tools: AI-trace reduction, AIGC-rate reduction, and public-account article generation.
-- Streaming output: backend responses are streamed through SSE and rendered live in the frontend.
-- History: generated items can be saved, viewed, loaded, and deleted.
-- Markdown export: generated results can be exported as Markdown files.
-- Image watermark removal: two inpainting approaches are available, OpenCV and LaMa.
-- Model configuration: DeepSeek, OpenRouter, and generic OpenAI-compatible endpoints are supported.
-- User management: basic admin-driven user creation, status management, quota management, and password reset.
-- Local demo fallback: when no real model key is configured, the backend falls back to a mock provider.
+- AI writing tools: AI trace reduction, AIGC-rate reduction, and article generation.
+- Streaming generation: the backend streams model output through SSE and the frontend renders results in real time.
+- History records: generated content can be saved, viewed, loaded, and deleted.
+- Markdown export: generated results can be exported as Markdown files for further editing.
+- Image watermark removal: supports both OpenCV-based fast inpainting and LaMa-based intelligent inpainting.
+- Model configuration: supports DeepSeek, OpenRouter, and generic OpenAI-compatible endpoints.
+- User management: includes basic admin account management, user status, quota control, password reset, and role flags.
+- Local demo mode: when no real model API key is configured, the backend falls back to a mock provider.
 
-## Project Structure and Architecture
+## Architecture
 
 ```text
 CreationBox/
-├── backend/              # FastAPI backend
-│   ├── app/api/          # Auth, generation, image, user, and admin routes
+├── backend/              # FastAPI backend service
+│   ├── app/api/          # API routes for auth, generation, images, users, and admin
 │   ├── app/core/         # Configuration and security
 │   ├── app/db/           # Database session and compatibility migrations
 │   ├── app/models/       # SQLAlchemy models
-│   ├── app/schemas/      # Pydantic schemas
-│   └── app/services/     # AI provider, quota, prompts, image inpainting, business logic
+│   ├── app/schemas/      # Pydantic request and response schemas
+│   └── app/services/     # AI provider, quota, prompt, and image-processing services
 ├── frontend/             # React + Vite frontend
-│   ├── src/features/     # Workspace, history, watermark removal, admin, auth
-│   ├── src/lib/api/      # API clients
+│   ├── src/features/     # Workspace, history, watermark removal, admin, and auth pages
+│   ├── src/lib/api/      # Frontend API clients
 │   ├── src/styles/       # Global and feature styles
 │   └── src/types/        # TypeScript types
 ├── Skill/                # Prompt and skill files used by AI writing tools
-├── docs/                 # PRD, feature list, architecture notes, development log
-├── infra/nginx/          # Nginx reverse proxy config
-└── docker-compose.yml    # PostgreSQL, Redis, API, frontend, Nginx
+├── docs/                 # Product notes, feature list, architecture notes, and development log
+├── infra/nginx/          # Nginx reverse proxy configuration
+└── docker-compose.yml    # PostgreSQL, Redis, API, frontend, and Nginx orchestration
 ```
 
-Architecture summary:
+- Frontend: React, TypeScript, and Vite provide the workbench UI, streaming result display, image-mask editing, and admin pages.
+- Backend: FastAPI and SQLAlchemy handle authentication, APIs, SSE generation, quotas, history records, and image processing.
+- Data layer: local development can use SQLite, while Docker Compose runs PostgreSQL. Redis is used for login rate limiting and generation locks.
+- Deployment: Docker Compose starts PostgreSQL, Redis, the API service, the frontend service, and Nginx.
 
-- Frontend: React + TypeScript + Vite for workspace interactions, streaming results, image mask editing, and admin pages.
-- Backend: FastAPI + SQLAlchemy for authentication, APIs, SSE generation, quota, history, and image processing.
-- Data layer: SQLite can be used during local development, while Docker Compose uses PostgreSQL. Redis is used for login rate limiting and generation locks.
-- Deployment: Docker Compose runs PostgreSQL, Redis, API, frontend static assets, and Nginx.
+## AI Skills and Prompts
 
-## AI Writing and Skill Prompts
+The AI writing module depends on prompt files under the `Skill/` directory:
 
-The intelligent writing module depends heavily on the files under `Skill/`:
+- `Skill/Humanizer-zh-SKILL.md`: AI trace reduction and natural expression optimization.
+- `Skill/AIGC-Reduce-zh-SKILL.md`: AIGC-rate reduction and text rewriting.
+- `Skill/Article-Generate-zh-SKILL.md`: article generation.
 
-- `Skill/Humanizer-zh-SKILL.md`: AI-trace reduction and natural expression optimization.
-- `Skill/AIGC-Reduce-zh-SKILL.md`: AIGC-rate reduction and rewriting.
-- `Skill/Article-Generate-zh-SKILL.md`: public-account article generation.
+The backend loads these files as part of the system prompt or prompt template, then combines them with user input to build model requests. More prompt files can be added later, and new tool types can be registered in the backend to extend model-interaction capabilities.
 
-The backend loads these Skill files as part of the system prompt or prompt template, then combines them with user input to build model requests. More prompt files can be added later under `Skill/`, and new tool types can be registered in the backend to extend model-interaction capabilities, such as title generation, topic analysis, viral-structure breakdown, short-video scripts, and private-domain marketing copy.
+## Image Watermark Removal
 
-This design separates model behavior design from business code, making prompt iteration and new AI tool creation easier.
-
-## Watermark Removal
-
-CreationBox supports two image inpainting approaches:
+CreationBox provides two image inpainting approaches:
 
 1. OpenCV fast inpainting
    - The frontend lets users upload an image and mark the watermark area with a brush or rectangle.
-   - The backend receives the source image and mask, then calls OpenCV `cv2.inpaint`.
-   - Both Telea and Navier-Stokes methods are supported.
-   - This is lightweight and fast, suitable for simple watermarks and less complex backgrounds.
+   - The backend receives the image and mask, then calls OpenCV `cv2.inpaint`.
+   - This approach is lightweight and fast, suitable for small watermarks and simple backgrounds.
 
 2. LaMa intelligent inpainting
-   - The frontend marking flow is the same.
    - The backend sends the image and mask to `simple-lama-inpainting` for deep-learning-based completion.
-   - Image size, pixel count, and concurrency are limited by config to protect local CPU/GPU resources.
-   - Docker Compose mounts a persistent model cache and enables `INPAINT_LAMA_PRELOAD=true` so the backend warms the model in the background after startup, reducing the first smart-inpainting wait.
-   - It usually works better for complex backgrounds and larger masked areas, but dependencies are heavier and CPU inference can be slow.
+   - Image size, pixel count, and concurrency are limited by configuration to protect local CPU/GPU resources.
+   - Docker Compose mounts a persistent model cache and enables `INPAINT_LAMA_PRELOAD=true`, so the backend warms the model in the background after startup.
+   - LaMa usually works better for complex backgrounds and larger masked areas, but dependencies are heavier and CPU inference can be slower.
 
-## Frontend Design Language
+## Design Language
 
 The frontend uses a frosted-glass Mac-style design language:
 
-- Translucent panels, soft shadows, subtle borders, and backdrop blur.
+- Translucent panels, soft shadows, subtle borders, and background blur.
 - Workspace-first layout instead of a marketing landing page.
-- Left tool navigation, central input workspace, and result panel.
-- Light/dark themes, mobile tool switching, and responsive layout.
-- A clean desktop-app feeling designed for focused creative work.
+- Left navigation, central creation workspace, and result panel.
+- Light and dark themes, mobile tool switching, and responsive layout.
+- A lightweight desktop-app feeling for focused writing workflows.
 
 ## User Management
 
@@ -291,16 +271,8 @@ The current user system is intentionally simple for the MVP:
 
 - Default admin account: `admin / admin`.
 - Public registration is disabled by default.
-- Admin users can create users, update status, grant admin permissions, adjust daily quota, and reset passwords.
-- Regular users are limited by daily quota, while the default admin has unlimited quota.
-
-Future improvements:
-
-- Change the default admin password and `JWT_SECRET` before deployment.
-- Add self-service registration, email verification, and password recovery.
-- Add refresh-token auto-renewal and logout revocation.
-- Add more granular roles, audit logs, and operation records.
-- Add membership plans, quota billing records, and payment workflows.
+- Admin users can create users, update status, grant admin permissions, adjust daily quotas, and reset passwords.
+- Regular users are limited by daily quota; the default admin has unlimited quota.
 
 ## Quick Start
 
@@ -324,7 +296,7 @@ Username: admin
 Password: admin
 ```
 
-Local development:
+Local backend:
 
 ```powershell
 cd backend
@@ -332,13 +304,15 @@ pip install -e ".[test]"
 uvicorn app.main:app --reload
 ```
 
+Local frontend:
+
 ```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
-The Vite dev server proxies `/api` to `http://localhost:8000`. If both services are already running, visit:
+The Vite dev server proxies `/api` to `http://localhost:8000`. If both services are running locally, open:
 
 ```text
 http://127.0.0.1:5173
@@ -381,7 +355,7 @@ AI_MODEL_TEXT=your-model-id
 - `POST /api/auth/register`: disabled in MVP admin-only mode.
 - `POST /api/auth/login`: login.
 - `POST /api/auth/refresh`: refresh token.
-- `GET /api/me`: current user and quota info.
+- `GET /api/me`: current user and quota information.
 - `POST /api/generations/stream`: streaming generation.
 - `GET /api/generations`: generation history list.
 - `GET /api/generations/{id}`: generation detail.
@@ -392,8 +366,7 @@ AI_MODEL_TEXT=your-model-id
 
 ## Notes
 
-- This project is for personal learning and MVP demonstration only. It does not guarantee generation quality, detection bypassing, or production readiness.
-- The initial schema is created on FastAPI startup for MVP speed. Add Alembic migrations before production rollout.
-- Link crawling and file parsing are not fully implemented yet. Reference links are currently passed to the model as text context.
+- The initial database schema is created during FastAPI startup.
+- Link crawling and full file parsing are not fully implemented yet; reference links are currently passed to the model as text context.
 - LaMa-based image inpainting has heavier dependencies and may be slow on CPU.
 - Before deployment, replace the default account password, JWT secret, CORS config, and real model keys.
