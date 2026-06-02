@@ -102,13 +102,15 @@ export function CreationWorkspace({
               <p>{tool.sourceHelper}</p>
             </div>
           </div>
-          <div className="mode-tabs" role="tablist" aria-label="输入模式">
-            {tool.modes.map((item) => (
-              <button key={item.id} className={mode === item.id ? "active" : ""} type="button" onClick={() => setMode(item.id)}>
-                {item.label}
-              </button>
-            ))}
-          </div>
+          {tool.modes.length > 1 && (
+            <div className="mode-tabs" role="tablist" aria-label="输入模式">
+              {tool.modes.map((item) => (
+                <button key={item.id} className={mode === item.id ? "active" : ""} type="button" onClick={() => setMode(item.id)}>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
           {showLink && (
             <label className="field">
               <span>参考链接</span>
