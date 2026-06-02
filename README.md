@@ -171,20 +171,6 @@ AI_API_KEY=your-provider-key
 AI_MODEL_TEXT=your-model-id
 ```
 
-## API 概览
-
-- `POST /api/auth/register`：MVP 管理员模式下禁用。
-- `POST /api/auth/login`：登录。
-- `POST /api/auth/refresh`：刷新 token。
-- `GET /api/me`：当前用户信息与额度。
-- `POST /api/generations/stream`：流式生成。
-- `GET /api/generations`：历史记录列表。
-- `GET /api/generations/{id}`：历史记录详情。
-- `DELETE /api/generations/{id}`：删除历史记录。
-- `POST /api/generations/{id}/export-markdown`：导出 Markdown。
-- `POST /api/images/inpaint`：图片修复/水印去除。
-- `/api/admin/*`：管理员用户与模型配置接口。
-
 ## 注意事项
 
 - 首版数据库 schema 在 FastAPI 启动时自动创建。
@@ -357,20 +343,6 @@ AI_BASE_URL=https://your-provider.example/v1
 AI_API_KEY=your-provider-key
 AI_MODEL_TEXT=your-model-id
 ```
-
-## API Overview
-
-- `POST /api/auth/register`: disabled in MVP admin-only mode.
-- `POST /api/auth/login`: login.
-- `POST /api/auth/refresh`: refresh token.
-- `GET /api/me`: current user and quota information.
-- `POST /api/generations/stream`: streaming generation.
-- `GET /api/generations`: generation history list.
-- `GET /api/generations/{id}`: generation detail.
-- `DELETE /api/generations/{id}`: delete a history item.
-- `POST /api/generations/{id}/export-markdown`: export Markdown.
-- `POST /api/images/inpaint`: image inpainting and watermark removal.
-- `/api/admin/*`: admin user and model configuration APIs.
 
 ## Notes
 
