@@ -17,6 +17,12 @@ CreationBox 是一个面向文本编写创作的 AI 创作工作台 MVP。项目
 - 用户管理：提供管理员账号、用户创建、状态管理、额度管理、密码重置等简单后台能力。
 - 本地演示：未配置真实模型 Key 时自动回退到 mock provider，方便完整体验流程。
 
+## Screenshots
+
+![CreationBox 示例 1](docs/示例1.png)
+
+![CreationBox 示例 2](docs/示例2.png)
+
 ## 项目层级与架构
 
 ```text
