@@ -380,7 +380,7 @@ export function ImageWatermarkPage() {
           ) : (
             <div className="engine-note" role="note">
               <strong>智能修复</strong>
-              <span>使用 LaMa 在后端 CPU 上推理，首次等待时间较长；当前同一时刻只处理 1 个智能修复任务，处理期间请保持当前页面打开。</span>
+              <span>使用 LaMa CPU 推理，首次等待时间较长；当前同一时刻只处理 1 个智能修复任务，处理期间请保持当前页面打开。</span>
             </div>
           )}
 

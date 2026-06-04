@@ -23,7 +23,7 @@ export function AdminPage({ isAdmin }: { isAdmin: boolean }) {
       <div className="tool-header">
         <span className="tool-kicker"><ShieldCheck size={16} aria-hidden="true" />后台管理</span>
         <h2 id="admin-title">后台管理</h2>
-        <p>管理用户使用次数、管理员权限和当前大模型配置。</p>
+        <p>管理用户使用次数、管理员权限和模型配置。</p>
       </div>
       <div className="mode-tabs admin-tabs" role="tablist" aria-label="后台管理模块">
         <button type="button" className={tab === "users" ? "active" : ""} onClick={() => setTab("users")}>
