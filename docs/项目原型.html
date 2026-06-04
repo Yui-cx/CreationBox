@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreationBox - 公众号 AI 文本工作台</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --surface-soft: #eef3f8;
+            --surface-muted: #f8fafc;
+            --text: #142033;
+            --text-muted: #667085;
+            --text-soft: #8a95a6;
+            --line: #dbe4ee;
+            --primary: #2563eb;
+            --primary-strong: #1d4ed8;
+            --primary-soft: #dbeafe;
+            --accent: #0f766e;
+            --warning: #b45309;
+            --success: #15803d;
+            --danger: #b91c1c;
+            --shadow: 0 16px 40px rgba(21, 32, 51, 0.08);
+            --radius: 8px;
+        }
+
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #0c111d;
+            --surface: #111827;
+            --surface-soft: #172033;
+            --surface-muted: #0f172a;
+            --text: #eef4ff;
+            --text-muted: #a8b3c7;
+            --text-soft: #7d8ba3;
+            --line: #263247;
+            --primary: #60a5fa;
+            --primary-strong: #93c5fd;
+            --primary-soft: #132947;
+            --accent: #2dd4bf;
+            --warning: #fbbf24;
+            --success: #4ade80;
+            --danger: #f87171;
+            --shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-width: 320px;
+            background: var(--bg);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Roboto, Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:focus-visible,
+        textarea:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
+            outline-offset: 2px;
+        }
+
+        .app-shell {
+            min-height: 100dvh;
+            display: grid;
+            grid-template-columns: 264px minmax(0, 1fr);
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 24px 16px;
+            border-right: 1px solid var(--line);
+            background: var(--surface);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px;
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: var(--radius);
+            background: var(--primary);
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 750;
+        }
+
+        .brand-subtitle {
+            margin: 2px 0 0;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .nav-section {
+            display: grid;
+            gap: 8px;
+        }
+
+        .nav-label {
+            padding: 0 8px;
+            color: var(--text-soft);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .tool-nav {
+            display: grid;
+            gap: 6px;
+        }
+
+        .nav-button {
+            width: 100%;
+            min-height: 48px;
+            display: grid;
+            grid-template-columns: 24px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text-muted);
+            text-align: left;
+        }
+
+        .nav-button svg,
+        .top-button svg,
+        .icon-inline svg,
+        .action-button svg,
+        .ghost-button svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        .nav-button:hover {
+            background: var(--surface-soft);
+            color: var(--text);
+        }
+
+        .nav-button.active {
+            border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
+            background: var(--primary-soft);
+            color: var(--primary-strong);
+            font-weight: 700;
+        }
+
+        .nav-pill {
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: var(--surface-soft);
+            color: var(--text-soft);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-muted);
+        }
+
+        .quota-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .quota-bar {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: var(--line);
+        }
+
+        .quota-fill {
+            width: 62%;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .main {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 28px;
+            border-bottom: 1px solid var(--line);
+            background: color-mix(in srgb, var(--surface) 92%, transparent);
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar-title {
+            min-width: 0;
+        }
+
+        .topbar-title h1 {
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.25;
+        }
+
+        .topbar-title p {
+            margin: 4px 0 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .top-button,
+        .ghost-button,
+        .action-button {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--text);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .top-button,
+        .ghost-button {
+            padding: 0 14px;
+        }
+
+        .top-button:hover,
+        .ghost-button:hover {
+            border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+            background: var(--surface-soft);
+        }
+
+        .workspace {
+            width: min(1280px, 100%);
+            margin: 0 auto;
+            padding: 28px;
+        }
+
+        .tool-header {
+            margin-bottom: 20px;
+        }
+
+        .tool-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 30px;
+            padding: 4px 10px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--text-muted);
+            background: var(--surface);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .tool-header h2 {
+            margin: 12px 0 8px;
+            font-size: 30px;
+            line-height: 1.2;
+        }
+
+        .tool-header p {
+            max-width: 760px;
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 18px 0;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .panel-subtitle {
+            margin: 4px 0 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .panel-body {
+            display: grid;
+            gap: 16px;
+            padding: 18px;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 4px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-muted);
+        }
+
+        .mode-tab {
+            flex: 1;
+            min-height: 38px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .mode-tab.active {
+            background: var(--surface);
+            color: var(--primary-strong);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .label {
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .helper {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .helper-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .char-counter {
+            color: var(--text-soft);
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .file-input {
+            min-height: 88px;
+            padding: 18px;
+            border: 1px dashed color-mix(in srgb, var(--primary) 45%, var(--line));
+            background: var(--surface-muted);
+        }
+
+        .file-input::file-selector-button {
+            min-height: 38px;
+            margin-right: 12px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        textarea,
+        input,
+        select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-muted);
+            color: var(--text);
+        }
+
+        textarea {
+            min-height: 226px;
+            padding: 14px;
+            resize: vertical;
+        }
+
+        input,
+        select {
+            min-height: 44px;
+            padding: 0 12px;
+        }
+
+        .range-wrap {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            min-height: 24px;
+            accent-color: var(--primary);
+        }
+
+        .range-value {
+            min-width: 42px;
+            text-align: right;
+            color: var(--primary-strong);
+            font-weight: 800;
+        }
+
+        .quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            min-height: 34px;
+            padding: 0 10px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--surface);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .chip:hover {
+            border-color: var(--primary);
+            color: var(--primary-strong);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 0 16px;
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .action-button:hover {
+            background: var(--primary-strong);
+        }
+
+        .action-button:disabled {
+            cursor: wait;
+            opacity: 0.7;
+        }
+
+        .status-text {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .status-text.error {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        .result-panel {
+            min-height: 632px;
+        }
+
+        .result-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .score-card {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 14px;
+            align-items: center;
+        }
+
+        .score-ring {
+            width: 64px;
+            height: 64px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            color: var(--primary-strong);
+            background:
+                radial-gradient(circle at center, var(--surface) 58%, transparent 60%),
+                conic-gradient(var(--primary) calc(var(--score, 0) * 1%), var(--line) 0);
+            font-weight: 850;
+        }
+
+        .score-card h3 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .score-card p {
+            margin: 3px 0 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .result-body {
+            display: grid;
+            gap: 16px;
+            padding: 18px;
+        }
+
+        .empty-state,
+        .loading-state {
+            min-height: 410px;
+            display: grid;
+            place-items: center;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .empty-state h3,
+        .loading-state h3 {
+            margin: 14px 0 6px;
+            font-size: 18px;
+        }
+
+        .empty-state p,
+        .loading-state p {
+            max-width: 420px;
+            margin: 0 auto;
+            color: var(--text-muted);
+        }
+
+        .empty-icon,
+        .loader-icon {
+            width: 56px;
+            height: 56px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--primary-soft);
+            color: var(--primary-strong);
+        }
+
+        .loader-icon {
+            animation: pulse 1s ease-in-out infinite alternate;
+        }
+
+        .result-block {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-muted);
+            overflow: hidden;
+        }
+
+        .result-block h4 {
+            margin: 0;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+            background: var(--surface);
+            font-size: 13px;
+        }
+
+        .result-copy {
+            margin: 0;
+            padding: 14px;
+            color: var(--text);
+            white-space: pre-wrap;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .insight-list {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .insight-list li {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .insight-list li::before {
+            content: "";
+            flex: 0 0 auto;
+            width: 8px;
+            height: 8px;
+            margin-top: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 30;
+            transform: translateY(18px);
+            opacity: 0;
+            pointer-events: none;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: var(--shadow);
+            transition: opacity 160ms ease, transform 160ms ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mobile-tool-switch {
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(0.96);
+                opacity: 0.75;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @media (max-width: 1040px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-tool-switch {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+
+            .mobile-tool-switch .nav-button {
+                width: max-content;
+                min-width: 178px;
+                flex: 0 0 auto;
+            }
+
+            .work-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-panel {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .top-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .top-actions > * {
+                flex: 1;
+            }
+
+            .workspace {
+                padding: 18px 16px 28px;
+            }
+
+            .tool-header h2 {
+                font-size: 24px;
+            }
+
+            .field-row,
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .result-toolbar,
+            .actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .button-group,
+            .result-actions {
+                width: 100%;
+            }
+
+            .button-group > *,
+            .result-actions > * {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="CreationBox 工具导航">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">CB</div>
+                <div>
+                    <p class="brand-name">CreationBox</p>
+                    <p class="brand-subtitle">公众号 AI 文本工作台</p>
+                </div>
+            </div>
+
+            <nav class="nav-section" aria-label="核心工具">
+                <div class="nav-label">核心工具</div>
+                <div class="tool-nav" id="desktopNav"></div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="quota-label">
+                    <span>今日免费次数</span>
+                    <strong id="quotaText">3 / 5</strong>
+                </div>
+                <div class="quota-bar" aria-hidden="true">
+                    <div class="quota-fill" id="quotaFill"></div>
+                </div>
+                <span class="helper">注册后可保留历史记录与常用风格。</span>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1>高效整理公众号内容表达</h1>
+                    <p>围绕自然表达、结构仿写和文章生成，快速完成从素材到草稿的工作流。</p>
+                </div>
+                <div class="top-actions">
+                    <button class="top-button" id="themeToggle" type="button">
+                        <span id="themeIconSlot" aria-hidden="true"><i data-lucide="moon"></i></span>
+                        <span>深色模式</span>
+                    </button>
+                    <button class="top-button" type="button" id="loginButton">
+                        <i data-lucide="user-round" aria-hidden="true"></i>
+                        <span>登录 / 注册</span>
+                    </button>
+                </div>
+            </header>
+
+            <nav class="mobile-tool-switch" id="mobileNav" aria-label="移动端工具导航"></nav>
+
+            <section class="workspace" aria-live="polite">
+                <div class="tool-header">
+                    <div>
+                        <span class="tool-kicker icon-inline">
+                            <span id="toolKickerIconSlot" aria-hidden="true"><i data-lucide="sparkles"></i></span>
+                            <span id="toolKicker">自然表达优化</span>
+                        </span>
+                        <h2 id="toolTitle">AI痕迹去除</h2>
+                        <p id="toolDescription">将机械、模板化的表达改写成更自然、有节奏的公众号文字，帮助内容更像真实编辑完成的稿件。</p>
+                    </div>
+                </div>
+
+                <div class="work-grid">
+                    <section class="panel" aria-labelledby="inputTitle">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title" id="inputTitle">输入内容</h3>
+                                <p class="panel-subtitle" id="inputSubtitle">粘贴需要优化的公众号段落，或使用示例快速体验。</p>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="mode-tabs" id="modeTabs" aria-label="输入模式"></div>
+
+                            <div class="field" id="linkField">
+                                <label class="label" for="sourceLink">参考链接</label>
+                                <input id="sourceLink" type="url" inputmode="url" placeholder="https://example.com/article" autocomplete="off">
+                                <span class="helper" id="linkHelper">静态原型仅模拟链接识别，不会访问真实页面。</span>
+                            </div>
+
+                            <div class="field" id="topicField">
+                                <label class="label" for="topicInput">文章主题</label>
+                                <input id="topicInput" type="text" placeholder="例如：一家本地咖啡品牌如何用社群提升复购">
+                            </div>
+
+                            <div class="field" id="fileField">
+                                <label class="label" for="sourceFile">导入文件</label>
+                                <input class="file-input" id="sourceFile" type="file" accept=".txt,.md,.markdown,.pdf,text/plain,text/markdown,application/pdf">
+                                <span class="helper">支持 txt、markdown、pdf；静态原型仅模拟文件导入结果。</span>
+                            </div>
+
+                            <div class="field" id="textField">
+                                <label class="label" for="sourceText" id="sourceTextLabel">原文内容</label>
+                                <textarea id="sourceText" placeholder="粘贴公众号文章、段落或素材。"></textarea>
+                                <div class="helper-row">
+                                    <span class="helper" id="sourceTextHelper">建议输入 200 字以上，模拟结果会更完整。</span>
+                                    <span class="char-counter" id="charCounter">0 字</span>
+                                </div>
+                            </div>
+
+                            <div class="field-row" id="configFields">
+                                <div class="field">
+                                    <label class="label" for="styleSelect" id="styleLabel">公众号风格</label>
+                                    <select id="styleSelect"></select>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="audienceSelect" id="audienceLabel">目标读者</label>
+                                    <select id="audienceSelect"></select>
+                                </div>
+                            </div>
+
+                            <div class="field" id="strengthField">
+                                <label class="label" for="strengthRange">优化强度</label>
+                                <div class="range-wrap">
+                                    <input id="strengthRange" type="range" min="1" max="5" value="3">
+                                    <span class="range-value" id="strengthValue">3 / 5</span>
+                                </div>
+                            </div>
+
+                            <div class="field" id="keywordField">
+                                <label class="label" for="keywordInput">需要保留的关键词</label>
+                                <input id="keywordInput" type="text" placeholder="例如：私域运营、复购、公众号">
+                                <span class="helper">多个关键词可用逗号分隔。</span>
+                            </div>
+
+                            <div class="field">
+                                <span class="label">快速示例</span>
+                                <div class="quick-chips" id="quickChips"></div>
+                            </div>
+
+                            <div class="actions">
+                                <div class="button-group">
+                                    <button class="action-button" id="generateButton" type="button">
+                                        <i data-lucide="wand-sparkles" aria-hidden="true"></i>
+                                        <span id="generateLabel">开始优化</span>
+                                    </button>
+                                    <button class="ghost-button" id="clearButton" type="button">
+                                        <i data-lucide="eraser" aria-hidden="true"></i>
+                                        <span>清空输入</span>
+                                    </button>
+                                </div>
+                                <span class="status-text" id="statusText">结果为本地模拟，用于演示产品流程。</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="panel result-panel" aria-labelledby="resultTitle">
+                        <div class="result-toolbar">
+                            <div class="score-card">
+                                <div class="score-ring" id="scoreRing" style="--score: 0">--</div>
+                                <div>
+                                    <h3 id="scoreTitle">等待生成结果</h3>
+                                    <p id="scoreDesc">输入内容后可查看自然度评分与编辑建议。</p>
+                                </div>
+                            </div>
+                            <div class="result-actions">
+                                <button class="ghost-button" id="copyButton" type="button" disabled>
+                                    <i data-lucide="copy" aria-hidden="true"></i>
+                                    <span>复制结果</span>
+                                </button>
+                                <button class="ghost-button" id="exportButton" type="button" disabled>
+                                    <i data-lucide="download" aria-hidden="true"></i>
+                                    <span>导出 Markdown</span>
+                                </button>
+                                <button class="ghost-button" id="regenerateButton" type="button" disabled>
+                                    <i data-lucide="refresh-cw" aria-hidden="true"></i>
+                                    <span>重新生成</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-body" id="resultBody">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i data-lucide="file-text" aria-hidden="true"></i>
+                                </div>
+                                <div>
+                                    <h3 id="resultTitle">你的结果会出现在这里</h3>
+                                    <p>先选择工具并填写内容。系统会展示模拟输出、前后对比和可执行的编辑建议。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        const tools = {
+            humanize: {
+                id: "humanize",
+                title: "AI痕迹去除",
+                kicker: "自然表达优化",
+                icon: "sparkles",
+                navIcon: "scan-text",
+                tag: "默认",
+                description: "将机械、模板化的表达改写成更自然、有节奏的公众号文字，帮助内容更像真实编辑完成的稿件。",
+                inputSubtitle: "输入需要优化的内容，选择处理模式后快速生成更自然的表达。",
+                modes: [
+                    { id: "quick", label: "极速模式", limit: 600 },
+                    { id: "long", label: "长文本模式", limit: 2500 },
+                    { id: "file", label: "文件导入模式", limit: 2500 }
+                ],
+                generateLabel: "开始优化",
+                sourceLabel: "输入内容",
+                sourceHelper: "极速模式最多 600 字，长文本模式最多 2500 字。",
+                textPlaceholder: "输入需要去除机械感的内容。",
+                styleLabel: "",
+                audienceLabel: "",
+                styles: ["默认"],
+                audiences: ["默认"],
+                show: { text: true, link: false, topic: false, file: true, strength: false, keyword: false, config: false },
+                examples: [
+                    "随着消费环境的持续变化，品牌需要通过系统化的方法提升用户粘性，并在长期运营中形成稳定的复购机制。",
+                    "本文将从内容定位、用户分层和社群运营三个方面进行分析，帮助商家建立更具持续性的增长路径。",
+                    "数据表明，越来越多的用户开始关注产品背后的真实体验，而不是单纯被促销信息驱动。"
+                ],
+                result: ({ input, mode, fileName }) => {
+                    const modeLabel = mode === "quick" ? "极速模式" : mode === "file" ? "文件导入模式" : "长文本模式";
+                    const sourceNote = mode === "file" ? `\n\n导入文件：${fileName}` : "";
+                    return {
+                        score: mode === "quick" ? 86 : 90,
+                        scoreTitle: "自然度评分",
+                        scoreDesc: `已使用${modeLabel}优化表达节奏。`,
+                        blocks: [
+                            {
+                                title: "优化后正文",
+                                content: `最近这段时间，很多品牌都会遇到同一个问题：用户不是不感兴趣，而是很难被一句标准化的卖点真正打动。\n\n如果想让公众号内容更有转化空间，重点不只是把信息写完整，而是把用户正在犹豫的地方说清楚。比如为什么现在需要关注这件事、它和日常经营有什么关系、读者看完之后能马上做哪一步。\n\n所以，内容运营更像是一场持续沟通。先用真实场景拉近距离，再用清楚的结构交代方法，最后给出一个容易行动的小建议。这样的表达会更自然，也更容易让读者读下去。${sourceNote}`
+                            },
+                            {
+                                title: "编辑建议",
+                                content: "减少抽象判断，增加具体场景；把长句拆成短句；弱化模板化连接词。"
+                            }
+                        ],
+                        comparison: {
+                            before: input.slice(0, 180) || "原文内容将在这里展示。",
+                            after: "用户不是被信息说服，而是被一个足够贴近自己的场景带入。先讲清问题，再给出方法，内容就会更像一次真实沟通。"
+                        },
+                        insights: ["弱化模板化连接词，增强段落转折的口语感。", "保留原意，不额外增加复杂配置。", "优化首段进入速度，提升公众号阅读完成率。"]
+                    };
+                }
+            },
+            imitate: {
+                id: "imitate",
+                title: "公众号文章仿写",
+                kicker: "结构与表达迁移",
+                icon: "copy-check",
+                navIcon: "git-compare-arrows",
+                tag: "仿写",
+                description: "从参考文章中提取标题节奏、段落结构和叙事方式，生成适合公众号发布的仿写草稿。",
+                inputSubtitle: "粘贴公众号链接或原文，选择仿写目标后生成结构化结果。",
+                modes: [{ id: "link", label: "公众号链接" }, { id: "text", label: "粘贴原文" }],
+                generateLabel: "生成仿写",
+                sourceLabel: "参考原文",
+                sourceHelper: "粘贴原文时建议保留标题、小标题和正文段落。",
+                textPlaceholder: "粘贴需要参考的公众号文章。",
+                linkPlaceholder: "https://mp.weixin.qq.com/...",
+                linkHelper: "支持公众号文章链接；静态原型仅模拟链接识别，不会访问真实页面。",
+                styleLabel: "仿写目标",
+                audienceLabel: "文章语气",
+                styles: ["标题结构", "行文框架", "观点角度", "案例叙事", "完整草稿"],
+                audiences: ["专业克制", "亲和口语", "观点犀利", "温暖叙事", "品牌官方"],
+                show: { text: true, link: true, topic: false, strength: false, keyword: true },
+                examples: [
+                    "https://mp.weixin.qq.com/s/example",
+                    "一篇好的公众号文章，通常不是把所有信息一次性讲完，而是用清晰的问题意识带着读者进入主题。",
+                    "如果你要写一篇关于会员运营的文章，可以先从一个真实门店场景开始，再拆解背后的运营动作。"
+                ],
+                result: ({ input, style, audience, keywords }) => {
+                    const source = input.startsWith("http") ? "参考链接" : "参考原文";
+                    const kept = keywords ? `\n\n关键词方向：${keywords}` : "";
+                    return {
+                        score: 88,
+                        scoreTitle: "结构匹配度",
+                        scoreDesc: `已基于${source}生成“${style}”方向，语气为“${audience}”。`,
+                        blocks: [
+                            {
+                                title: "标题建议",
+                                content: "1. 为什么你的公众号内容很努力，却很难让用户继续读下去？\n2. 公众号运营的关键，不是日更，而是让每篇文章承担一个明确任务\n3. 从选题到转化：一篇高完成度公众号文章的写法"
+                            },
+                            {
+                                title: "结构大纲",
+                                content: "开头：用一个常见运营困境引入。\n第一部分：指出内容低效的真正原因。\n第二部分：拆解选题、结构、语气三个关键动作。\n第三部分：给出可复用的写作模板。\n结尾：引导读者把下一篇文章先写成提纲。"
+                            },
+                            {
+                                title: "仿写正文示例",
+                                content: `很多公众号并不是缺选题，而是每篇文章都像在“完成发布任务”。读者点进来之后，很快就发现内容没有明确方向：既想讲观点，又想带产品，还想顺便做一次转化。\n\n更有效的做法，是先给文章设定一个单一任务。它可以是解释一个问题、建立一个认知、促成一次咨询，或者让用户记住一个品牌标签。任务越清楚，文章的结构就越稳。\n\n写作时可以先列三个问题：读者为什么会在意？他现在卡在哪里？看完后能做什么？只要这三个问题被回答，文章就不容易散。${kept}`
+                            }
+                        ],
+                        comparison: {
+                            before: "参考文章：提取标题节奏、段落推进和结尾方式。",
+                            after: "仿写结果：保留结构逻辑，改写为新的主题和表达。"
+                        },
+                        insights: ["提取的是结构与表达方式，不复刻原文句子。", "标题建议覆盖问题型、观点型和方法型。", "正文示例更适合公众号中长文开头。"]
+                    };
+                }
+            },
+            generate: {
+                id: "generate",
+                title: "生成文章",
+                kicker: "公众号草稿生成",
+                icon: "file-plus-2",
+                navIcon: "square-pen",
+                tag: "生成",
+                description: "输入主题或参考链接，快速生成公众号文章草稿，适合选题验证和初稿搭建。",
+                inputSubtitle: "填写主题或粘贴新闻、博客、官网、公众号等参考链接，系统会模拟生成完整草稿。",
+                modes: [{ id: "topic", label: "主题生成" }, { id: "link", label: "参考链接" }],
+                generateLabel: "生成文章",
+                sourceLabel: "补充素材",
+                sourceHelper: "可填写产品卖点、案例、门店信息或其他素材。",
+                textPlaceholder: "补充文章素材，例如品牌背景、案例、关键数据。",
+                linkPlaceholder: "https://news.example.com/article",
+                linkHelper: "支持新闻、博客、官网、公众号等参考链接；静态原型仅模拟链接识别。",
+                styleLabel: "内容类型",
+                audienceLabel: "文章语气",
+                styles: ["行业观察", "运营方法论", "品牌故事", "活动推文", "产品种草"],
+                audiences: ["专业可信", "轻松亲切", "克制高级", "热情直接", "故事感"],
+                show: { text: true, link: true, topic: true, strength: false, keyword: true },
+                examples: [
+                    "本地咖啡品牌如何用社群提升复购",
+                    "面向私域运营者，写一篇关于公众号内容规划的文章",
+                    "参考一个门店会员活动，生成适合公众号发布的预热文章"
+                ],
+                result: ({ input, topic, style, audience, keywords, mode }) => {
+                    const isLinkMode = mode === "link";
+                    const finalTopic = isLinkMode ? "参考链接中的核心话题" : topic || "公众号内容如何提升用户行动意愿";
+                    const kept = !isLinkMode && keywords ? `\n\n文中可自然植入关键词：${keywords}` : "";
+                    return {
+                        score: 91,
+                        scoreTitle: "草稿完整度",
+                        scoreDesc: isLinkMode ? "已基于参考链接提炼主题，并生成公众号文章草稿。" : `已生成“${style}”类型草稿，整体语气为“${audience}”。`,
+                        blocks: [
+                            {
+                                title: "文章标题",
+                                content: isLinkMode ? "从一条参考链接出发，如何写出更适合公众号传播的文章？" : `为什么说，${finalTopic}不是一次发布任务，而是一套持续经营动作？`
+                            },
+                            {
+                                title: "文章正文",
+                                content: isLinkMode
+                                    ? `参考链接提供了一个很好的切入点：${input}。\n\n写成公众号文章时，不必直接复述链接里的信息，而应该先提炼它背后的读者问题。比如这件事为什么值得关注？它和普通读者、行业从业者或品牌经营有什么关系？如果只停留在资讯转述，文章很容易读完就结束；如果能进一步给出判断和启发，内容才会形成传播价值。\n\n更适合公众号的写法，是先用一句话交代事件或观点，再拆解它带来的影响，最后给出读者可以带走的结论。这样既保留参考链接的信息基础，也能让文章拥有自己的表达角度。`
+                                    : `很多内容团队在做公众号时，会把重点放在“今天发什么”。但真正影响结果的，往往不是单篇文章的灵感，而是它能不能服务一个清楚的经营目标。\n\n以“${finalTopic}”为例，读者最关心的不是概念本身，而是这件事和自己的日常决策有什么关系。文章开头需要先把场景讲明白：用户为什么会遇到这个问题？如果不处理，会带来什么影响？\n\n接下来，再把解决方法拆成三个动作。第一，明确文章要解决的单一问题；第二，用真实案例承接观点；第三，在结尾给出一个低门槛行动，例如收藏清单、回复关键词或预约咨询。\n\n这样写出来的公众号文章，不只是信息整理，而是一次完整的沟通。它能帮助读者理解问题，也能让品牌更自然地进入读者的决策过程。${kept}\n\n补充素材参考：${input || "暂无补充素材"}`
+                            },
+                            {
+                                title: "结尾行动建议",
+                                content: "可以在文末引导读者回复关键词领取选题模板，或预约一次内容诊断。"
+                            }
+                        ],
+                        comparison: {
+                            before: "输入主题与素材：用于确定文章方向。",
+                            after: "生成草稿：包含标题、正文和结尾行动建议。"
+                        },
+                        insights: ["首段建立问题场景，降低读者理解成本。", "正文按经营目标推进，避免泛泛而谈。", "结尾保留轻转化入口，适合公众号运营。"]
+                    };
+                }
+            }
+        };
+
+        const state = {
+            activeTool: "humanize",
+            activeMode: "quick",
+            lastResultText: "",
+            lastMarkdown: "",
+            quotaLeft: 3,
+            quotaTotal: 5,
+            toastTimer: null
+        };
+
+        const $ = (selector) => document.querySelector(selector);
+        const desktopNav = $("#desktopNav");
+        const mobileNav = $("#mobileNav");
+        const modeTabs = $("#modeTabs");
+        const quickChips = $("#quickChips");
+        const sourceText = $("#sourceText");
+        const sourceLink = $("#sourceLink");
+        const sourceFile = $("#sourceFile");
+        const topicInput = $("#topicInput");
+        const styleSelect = $("#styleSelect");
+        const audienceSelect = $("#audienceSelect");
+        const keywordInput = $("#keywordInput");
+        const strengthRange = $("#strengthRange");
+        const strengthValue = $("#strengthValue");
+        const charCounter = $("#charCounter");
+        const resultBody = $("#resultBody");
+        const statusText = $("#statusText");
+        const generateButton = $("#generateButton");
+        const clearButton = $("#clearButton");
+        const copyButton = $("#copyButton");
+        const exportButton = $("#exportButton");
+        const regenerateButton = $("#regenerateButton");
+        const themeToggle = $("#themeToggle");
+        const toast = $("#toast");
+
+        function createNavButton(tool, mobile = false) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "nav-button";
+            button.dataset.tool = tool.id;
+            button.setAttribute("aria-pressed", tool.id === state.activeTool ? "true" : "false");
+            button.innerHTML = `
+                <i data-lucide="${tool.navIcon}" aria-hidden="true"></i>
+                <span>${tool.title}</span>
+                <span class="nav-pill">${mobile ? "工具" : tool.tag}</span>
+            `;
+            button.addEventListener("click", () => setActiveTool(tool.id));
+            return button;
+        }
+
+        function renderNav() {
+            desktopNav.innerHTML = "";
+            mobileNav.innerHTML = "";
+            Object.values(tools).forEach((tool) => {
+                desktopNav.appendChild(createNavButton(tool));
+                mobileNav.appendChild(createNavButton(tool, true));
+            });
+        }
+
+        function setActiveTool(toolId) {
+            state.activeTool = toolId;
+            state.activeMode = tools[toolId].modes[0].id;
+            renderTool();
+            resetResult();
+        }
+
+        function renderTool() {
+            const tool = tools[state.activeTool];
+            $("#toolTitle").textContent = tool.title;
+            $("#toolDescription").textContent = tool.description;
+            $("#toolKicker").textContent = tool.kicker;
+            $("#toolKickerIconSlot").innerHTML = `<i data-lucide="${tool.icon}"></i>`;
+            $("#inputSubtitle").textContent = tool.inputSubtitle;
+            $("#generateLabel").textContent = tool.generateLabel;
+            $("#sourceTextLabel").textContent = tool.sourceLabel;
+            $("#sourceTextHelper").textContent = tool.sourceHelper;
+            sourceText.placeholder = tool.textPlaceholder;
+            sourceLink.placeholder = tool.linkPlaceholder || "https://example.com/article";
+            $("#linkHelper").textContent = tool.linkHelper || "静态原型仅模拟链接识别，不会访问真实页面。";
+            $("#styleLabel").textContent = tool.styleLabel;
+            $("#audienceLabel").textContent = tool.audienceLabel;
+            styleSelect.innerHTML = tool.styles.map((item) => `<option>${item}</option>`).join("");
+            audienceSelect.innerHTML = tool.audiences.map((item) => `<option>${item}</option>`).join("");
+
+            modeTabs.innerHTML = "";
+            tool.modes.forEach((mode) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "mode-tab";
+                button.textContent = mode.label;
+                button.dataset.mode = mode.id;
+                button.addEventListener("click", () => {
+                    state.activeMode = mode.id;
+                    renderInputVisibility();
+                    resetResult();
+                });
+                modeTabs.appendChild(button);
+            });
+
+            quickChips.innerHTML = "";
+            tool.examples.forEach((example) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "chip";
+                chip.textContent = example.startsWith("http") ? "参考链接示例" : example.slice(0, 18) + (example.length > 18 ? "..." : "");
+                chip.addEventListener("click", () => fillExample(example));
+                quickChips.appendChild(chip);
+            });
+
+            document.querySelectorAll(".nav-button").forEach((button) => {
+                const isActive = button.dataset.tool === state.activeTool;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-pressed", isActive ? "true" : "false");
+            });
+
+            renderInputVisibility();
+            refreshIcons();
+        }
+
+        function renderInputVisibility() {
+            const tool = tools[state.activeTool];
+            const mode = state.activeMode;
+            const showLink = tool.show.link && mode === "link";
+            const showTopic = tool.show.topic && mode === "topic";
+            const showFile = tool.show.file && mode === "file";
+            const showText = tool.show.text && mode !== "link" && mode !== "file";
+            const hideGenerateLinkExtras = state.activeTool === "generate" && mode === "link";
+            $("#linkField").classList.toggle("hidden", !showLink);
+            $("#topicField").classList.toggle("hidden", !showTopic);
+            $("#fileField").classList.toggle("hidden", !showFile);
+            $("#textField").classList.toggle("hidden", !showText);
+            $("#configFields").classList.toggle("hidden", tool.show.config === false || hideGenerateLinkExtras);
+            $("#strengthField").classList.toggle("hidden", !tool.show.strength);
+            $("#keywordField").classList.toggle("hidden", !tool.show.keyword || hideGenerateLinkExtras);
+            updateHumanizeHelper();
+
+            document.querySelectorAll(".mode-tab").forEach((button) => {
+                button.classList.toggle("active", button.dataset.mode === mode);
+            });
+        }
+
+        function fillExample(example) {
+            const mode = state.activeMode;
+            if (example.startsWith("http")) {
+                state.activeMode = "link";
+                sourceLink.value = example;
+            } else if (state.activeTool === "humanize") {
+                state.activeMode = "quick";
+                sourceText.value = example;
+            } else if (tools[state.activeTool].show.topic) {
+                state.activeMode = "topic";
+                topicInput.value = example;
+            } else if (tools[state.activeTool].modes.some((item) => item.id === "text")) {
+                state.activeMode = "text";
+                sourceText.value = example;
+            } else if (mode === "topic") {
+                topicInput.value = example;
+            } else {
+                sourceText.value = example;
+            }
+            renderInputVisibility();
+            updateCharCounter();
+            statusText.textContent = "已填入示例内容，可以直接生成。";
+            statusText.classList.remove("error");
+        }
+
+        function getInputValue() {
+            if (state.activeTool === "humanize" && state.activeMode === "file") {
+                return sourceFile.files[0]?.name.trim() || "";
+            }
+            if (state.activeMode === "link") {
+                return sourceLink.value.trim();
+            }
+            if (state.activeMode === "topic") {
+                return topicInput.value.trim();
+            }
+            return sourceText.value.trim();
+        }
+
+        function getActiveModeConfig() {
+            const tool = tools[state.activeTool];
+            return tool.modes.find((mode) => mode.id === state.activeMode) || tool.modes[0];
+        }
+
+        function getActiveModeLimit() {
+            return getActiveModeConfig().limit || 2500;
+        }
+
+        function getActiveModeLabel() {
+            return getActiveModeConfig().label || "当前模式";
+        }
+
+        function updateHumanizeHelper() {
+            if (state.activeTool !== "humanize") {
+                charCounter.textContent = `${sourceText.value.trim().length} 字`;
+                return;
+            }
+            if (state.activeMode === "file") {
+                $("#sourceTextHelper").textContent = "文件导入模式支持 txt、markdown、pdf。";
+                charCounter.textContent = sourceFile.files[0]?.name || "未选择文件";
+                return;
+            }
+            const limit = getActiveModeLimit();
+            $("#sourceTextHelper").textContent = `${getActiveModeLabel()}最多 ${limit} 字。`;
+            updateCharCounter();
+        }
+
+        function updateCharCounter() {
+            const count = sourceText.value.trim().length;
+            if (state.activeTool === "humanize" && state.activeMode !== "file") {
+                const limit = getActiveModeLimit();
+                charCounter.textContent = `${count} / ${limit} 字`;
+                charCounter.style.color = count > limit ? "var(--danger)" : "var(--text-soft)";
+                return;
+            }
+            charCounter.textContent = `${count} 字`;
+            charCounter.style.color = "var(--text-soft)";
+        }
+
+        function validateInput() {
+            const tool = tools[state.activeTool];
+            const value = getInputValue();
+            if (!value) {
+                const modeText = state.activeMode === "file" ? "导入文件" : state.activeMode === "link" ? "参考链接" : state.activeMode === "topic" ? "文章主题" : tool.sourceLabel;
+                statusText.textContent = `请先填写${modeText}。`;
+                statusText.classList.add("error");
+                return false;
+            }
+            if (state.activeTool === "humanize") {
+                if (state.activeMode === "file") {
+                    const file = sourceFile.files[0];
+                    const validExt = /\.(txt|md|markdown|pdf)$/i.test(file.name);
+                    if (!validExt) {
+                        statusText.textContent = "文件导入模式仅支持 txt、markdown、pdf。";
+                        statusText.classList.add("error");
+                        return false;
+                    }
+                } else {
+                    const limit = getActiveModeLimit();
+                    if (sourceText.value.trim().length > limit) {
+                        statusText.textContent = `${getActiveModeLabel()}最多支持 ${limit} 字，请精简内容或切换模式。`;
+                        statusText.classList.add("error");
+                        return false;
+                    }
+                }
+            }
+            statusText.classList.remove("error");
+            return true;
+        }
+
+        function setLoading(isLoading) {
+            generateButton.disabled = isLoading;
+            generateButton.querySelector("span").textContent = isLoading ? "生成中..." : tools[state.activeTool].generateLabel;
+            if (isLoading) {
+                resultBody.innerHTML = `
+                    <div class="loading-state">
+                        <div>
+                            <div class="loader-icon">
+                                <i data-lucide="loader-circle" aria-hidden="true"></i>
+                            </div>
+                            <h3>正在整理表达</h3>
+                            <p>静态原型正在模拟分析内容结构、语气和公众号阅读节奏。</p>
+                        </div>
+                    </div>
+                `;
+                refreshIcons();
+            }
+        }
+
+        function generateResult() {
+            if (!validateInput()) return;
+            setLoading(true);
+            copyButton.disabled = true;
+            exportButton.disabled = true;
+            regenerateButton.disabled = true;
+            statusText.textContent = "正在生成本地模拟结果。";
+
+            window.setTimeout(() => {
+                const tool = tools[state.activeTool];
+                const input = state.activeMode === "file" ? `已导入文件：${sourceFile.files[0]?.name || ""}` : state.activeMode === "link" ? sourceLink.value.trim() : sourceText.value.trim();
+                const result = tool.result({
+                    input,
+                    mode: state.activeMode,
+                    fileName: sourceFile.files[0]?.name || "",
+                    topic: topicInput.value.trim(),
+                    style: styleSelect.value,
+                    audience: audienceSelect.value,
+                    strength: strengthRange.value,
+                    keywords: keywordInput.value.trim()
+                });
+                renderResult(result);
+                setLoading(false);
+                if (state.quotaLeft > 0) {
+                    state.quotaLeft -= 1;
+                    renderQuota();
+                }
+                statusText.textContent = "已生成模拟结果。";
+                copyButton.disabled = false;
+                exportButton.disabled = false;
+                regenerateButton.disabled = false;
+            }, 700);
+        }
+
+        function renderResult(result) {
+            $("#scoreRing").style.setProperty("--score", result.score);
+            $("#scoreRing").textContent = result.score;
+            $("#scoreTitle").textContent = result.scoreTitle;
+            $("#scoreDesc").textContent = result.scoreDesc;
+
+            state.lastResultText = result.blocks.map((block) => `${block.title}\n${block.content}`).join("\n\n");
+            state.lastMarkdown = buildMarkdown(result);
+
+            const blocks = result.blocks.map((block) => `
+                <article class="result-block">
+                    <h4>${escapeHtml(block.title)}</h4>
+                    <p class="result-copy">${escapeHtml(block.content)}</p>
+                </article>
+            `).join("");
+
+            resultBody.innerHTML = `
+                ${blocks}
+                <div class="comparison">
+                    <article class="result-block">
+                        <h4>处理前</h4>
+                        <p class="result-copy">${escapeHtml(result.comparison.before)}</p>
+                    </article>
+                    <article class="result-block">
+                        <h4>处理后</h4>
+                        <p class="result-copy">${escapeHtml(result.comparison.after)}</p>
+                    </article>
+                </div>
+                <article class="result-block">
+                    <h4>编辑洞察</h4>
+                    <div class="result-copy">
+                        <ul class="insight-list">
+                            ${result.insights.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+                        </ul>
+                    </div>
+                </article>
+            `;
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function resetResult() {
+            $("#scoreRing").style.setProperty("--score", 0);
+            $("#scoreRing").textContent = "--";
+            $("#scoreTitle").textContent = "等待生成结果";
+            $("#scoreDesc").textContent = "输入内容后可查看自然度评分与编辑建议。";
+            resultBody.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i data-lucide="file-text" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3>你的结果会出现在这里</h3>
+                        <p>先选择工具并填写内容。系统会展示模拟输出、前后对比和可执行的编辑建议。</p>
+                    </div>
+                </div>
+            `;
+            state.lastResultText = "";
+            state.lastMarkdown = "";
+            copyButton.disabled = true;
+            exportButton.disabled = true;
+            regenerateButton.disabled = true;
+            statusText.textContent = "结果为本地模拟，用于演示产品流程。";
+            statusText.classList.remove("error");
+            refreshIcons();
+        }
+
+        function clearInputs() {
+            sourceText.value = "";
+            sourceLink.value = "";
+            sourceFile.value = "";
+            topicInput.value = "";
+            keywordInput.value = "";
+            strengthRange.value = 3;
+            strengthValue.textContent = "3 / 5";
+            updateCharCounter();
+            resetResult();
+            showToast("输入已清空");
+        }
+
+        async function copyResult() {
+            if (!state.lastResultText) return;
+            try {
+                await navigator.clipboard.writeText(state.lastResultText);
+                showToast("结果已复制");
+            } catch (error) {
+                showToast("当前浏览器不支持直接复制");
+            }
+        }
+
+        function buildMarkdown(result) {
+            const tool = tools[state.activeTool];
+            const lines = [
+                `# ${tool.title}`,
+                "",
+                `> ${result.scoreTitle}：${result.score}`,
+                "",
+                result.scoreDesc,
+                "",
+                ...result.blocks.flatMap((block) => [`## ${block.title}`, "", block.content, ""]),
+                "## 处理前",
+                "",
+                result.comparison.before,
+                "",
+                "## 处理后",
+                "",
+                result.comparison.after,
+                "",
+                "## 编辑洞察",
+                "",
+                ...result.insights.map((item) => `- ${item}`)
+            ];
+            return lines.join("\n");
+        }
+
+        function exportMarkdown() {
+            if (!state.lastMarkdown) return;
+            const tool = tools[state.activeTool];
+            const stamp = new Date().toISOString().slice(0, 19).replaceAll(":", "-");
+            const fileName = `${tool.title}-${stamp}.md`;
+            const blob = new Blob([state.lastMarkdown], { type: "text/markdown;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            showToast("Markdown 文件已导出");
+        }
+
+        function renderQuota() {
+            $("#quotaText").textContent = `${state.quotaLeft} / ${state.quotaTotal}`;
+            $("#quotaFill").style.width = `${(state.quotaLeft / state.quotaTotal) * 100}%`;
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add("show");
+            window.clearTimeout(state.toastTimer);
+            state.toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2400);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.dataset.theme;
+            const next = current === "dark" ? "light" : "dark";
+            document.documentElement.dataset.theme = next;
+            localStorage.setItem("creationbox-theme", next);
+            themeToggle.querySelector("span:last-child").textContent = next === "dark" ? "浅色模式" : "深色模式";
+            $("#themeIconSlot").innerHTML = `<i data-lucide="${next === "dark" ? "sun" : "moon"}"></i>`;
+            refreshIcons();
+        }
+
+        function initTheme() {
+            const stored = localStorage.getItem("creationbox-theme");
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            const theme = stored || (prefersDark ? "dark" : "light");
+            document.documentElement.dataset.theme = theme;
+            themeToggle.querySelector("span:last-child").textContent = theme === "dark" ? "浅色模式" : "深色模式";
+            $("#themeIconSlot").innerHTML = `<i data-lucide="${theme === "dark" ? "sun" : "moon"}"></i>`;
+        }
+
+        function refreshIcons() {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        strengthRange.addEventListener("input", () => {
+            strengthValue.textContent = `${strengthRange.value} / 5`;
+        });
+        sourceText.addEventListener("input", updateCharCounter);
+        sourceFile.addEventListener("change", updateHumanizeHelper);
+        generateButton.addEventListener("click", generateResult);
+        regenerateButton.addEventListener("click", generateResult);
+        clearButton.addEventListener("click", clearInputs);
+        copyButton.addEventListener("click", copyResult);
+        exportButton.addEventListener("click", exportMarkdown);
+        themeToggle.addEventListener("click", toggleTheme);
+        $("#loginButton").addEventListener("click", () => showToast("注册入口已预留，首版不接账号系统"));
+
+        initTheme();
+        renderNav();
+        renderTool();
+        renderQuota();
+        refreshIcons();
+    </script>
+</body>
+</html>
